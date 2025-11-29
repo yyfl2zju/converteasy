@@ -116,6 +116,7 @@ python -m app.main
 服务默认运行在 `http://localhost:8080`
 
 📚 **API 文档**：
+
 - Swagger UI: `http://localhost:8080/docs`
 - ReDoc: `http://localhost:8080/redoc`
 
@@ -331,6 +332,43 @@ gunicorn app.main:app -w 4 -k uvicorn.workers.UvicornWorker -b 0.0.0.0:8080
 
 # 检查 Python 依赖
 python app/scripts/check_dependencies.py
+```
+
+## ✅ 单元测试
+
+使用 `pytest` 运行后端单元测试。
+
+```bash
+cd backend
+pytest -q
+```
+
+如果缺少测试依赖，可安装：
+
+```bash
+pip install pytest pytest-asyncio httpx
+```
+
+测试说明：
+
+- 使用临时 `UPLOAD_DIR` 和 `PUBLIC_DIR`，不污染真实目录。
+- 对耗时的转换逻辑进行补丁替换为轻量 stub，保证测试快速稳定。
+
+## 🎯 生成测试样例文件
+
+可以使用生成脚本快速创建用于转换验证的样例文件（TXT/HTML/DOCX/XLSX/WAV）：
+
+```bash
+cd backend
+python tests/gen_samples.py
+```
+
+样例输出路径：`backend/tests/samples/`
+
+如需生成 DOCX/XLSX，确保安装：
+
+```bash
+pip install python-docx openpyxl
 ```
 
 ## 📄 License

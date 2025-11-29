@@ -2,39 +2,76 @@
 ##############################################
 # ConvertEasy Backend - Python FastAPI 版本
 # 支持文档转换（PDF/Word/Excel/PPT）和音频转换
+# 
+# 构建命令（启用 BuildKit 缓存加速）：
+#   DOCKER_BUILDKIT=1 docker build -t converteasy .
 ##############################################
 
 ARG PYTHON_VERSION=3.11
 
 ##############################################
-# Stage 1: 构建阶段
+# Stage 1: 系统依赖基础镜像（可缓存复用）
+##############################################
+FROM python:${PYTHON_VERSION}-slim AS base
+
+# 使用 BuildKit 缓存 apt 下载
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    # 基础依赖
+    ca-certificates \
+    curl \
+    # Python C 扩展运行时库
+    libcairo2 \
+    libffi8 \
+    libglib2.0-0 \
+    # LibreOffice 无头模式（文档转换）- 只安装必需组件
+    libreoffice-core-nogui \
+    libreoffice-writer-nogui \
+    libreoffice-calc-nogui \
+    libreoffice-impress-nogui \
+    # 字体支持（使用更小的字体包）
+    fonts-liberation \
+    fonts-wqy-microhei \
+    # 音频转换
+    ffmpeg
+
+##############################################
+# Stage 2: Python 依赖构建
 ##############################################
 FROM python:${PYTHON_VERSION}-slim AS builder
 
 WORKDIR /app
 
-# 安装构建依赖
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    gcc g++ libcairo2-dev libffi-dev pkg-config \
-    && rm -rf /var/lib/apt/lists/*
+# 安装构建依赖（使用缓存）
+RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,target=/var/lib/apt,sharing=locked \
+    apt-get update && apt-get install -y --no-install-recommends \
+    gcc g++ libcairo2-dev libffi-dev pkg-config
 
-# 创建虚拟环境并安装依赖
+# 创建虚拟环境
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# 使用 BuildKit 缓存 pip 下载
 COPY requirements.txt .
-RUN python3 -m venv /opt/venv \
-    && /opt/venv/bin/pip install --no-cache-dir -U pip wheel \
-    && /opt/venv/bin/pip install --no-cache-dir -r requirements.txt \
-    && find /opt/venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true \
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install -U pip wheel \
+    && pip install -r requirements.txt
+
+# 清理 Python 缓存文件
+RUN find /opt/venv -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true \
     && find /opt/venv -type f -name "*.pyc" -delete 2>/dev/null || true
 
 ##############################################
-# Stage 2: 运行时镜像
+# Stage 3: 运行时镜像
 ##############################################
-FROM python:${PYTHON_VERSION}-slim AS runtime
+FROM base AS runtime
 
 # 镜像元数据
 LABEL maintainer="ConvertEasy Team" \
       version="2.0.0" \
-      description="File conversion service with FastAPI - document and audio support"
+      description="File conversion service with FastAPI"
 
 # 环境变量
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -45,43 +82,20 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# 安装运行时依赖
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # 基础依赖
-    ca-certificates \
-    curl \
-    # Python C 扩展运行时库
-    libcairo2 \
-    libffi8 \
-    libglib2.0-0 \
-    # LibreOffice 无头模式（文档转换）
-    libreoffice-core-nogui \
-    libreoffice-writer-nogui \
-    libreoffice-calc-nogui \
-    libreoffice-impress-nogui \
-    # 字体支持
-    fonts-liberation \
-    fonts-noto-cjk \
-    # 音频转换
-    ffmpeg \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* \
-    # 创建应用目录
-    && mkdir -p /app/uploads /app/public \
+# 创建应用目录
+RUN mkdir -p /app/uploads /app/public \
     && chmod 755 /app/uploads /app/public
 
 # 复制虚拟环境
 COPY --from=builder /opt/venv /opt/venv
 
-# 复制应用代码
+# 复制应用代码（放在最后，变化最频繁）
 COPY app ./app
 
 # 复制证书配置（K8s lifecycle hook）
 COPY cert /app/cert
 RUN set -e; \
-    if [ -f /app/cert/initenv.sh ]; then \
-        chmod +x /app/cert/initenv.sh; \
-    fi; \
+    [ -f /app/cert/initenv.sh ] && chmod +x /app/cert/initenv.sh || true; \
     if [ -f /app/cert/certificate.crt ]; then \
         cp /app/cert/certificate.crt /usr/local/share/ca-certificates/ 2>/dev/null || true; \
         update-ca-certificates 2>/dev/null || true; \

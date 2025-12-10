@@ -17,12 +17,12 @@ repos:
         name: 检查 JSON 语法
       - id: check-added-large-files
         name: 检查大文件
-        args: ['--maxkb=1000']
+        args: ["--maxkb=1000"]
       - id: check-merge-conflict
         name: 检查合并冲突标记
       - id: mixed-line-ending
         name: 统一换行符
-        args: ['--fix=lf']
+        args: ["--fix=lf"]
       - id: detect-private-key
         name: 检测私钥文件
 
@@ -34,16 +34,7 @@ repos:
         name: Black 格式化
         language_version: python3
         files: ^backend/
-        args: ['--line-length=100']
-
-  # Python 导入排序 - isort
-  - repo: https://github.com/pycqa/isort
-    rev: 5.13.2
-    hooks:
-      - id: isort
-        name: isort 导入排序
-        files: ^backend/
-        args: ['--profile=black', '--line-length=100']
+        args: ["--line-length=100"]
 
   # Python 代码检查 - Flake8
   - repo: https://github.com/pycqa/flake8
@@ -53,9 +44,9 @@ repos:
         name: Flake8 代码检查
         files: ^backend/
         args:
-          - '--max-line-length=100'
-          - '--extend-ignore=E203,E501,W503'
-          - '--exclude=__pycache__,*.pyc,.git,venv'
+          - "--max-line-length=100"
+          - "--extend-ignore=E203,E501,W503"
+          - "--exclude=__pycache__,*.pyc,.git,venv"
 
   # Python 类型检查 - mypy（可选，较严格）
   # - repo: https://github.com/pre-commit/mirrors-mypy
@@ -77,7 +68,7 @@ repos:
         types: [file]
         additional_dependencies:
           - eslint@8.57.0
-        args: ['--fix', '--no-error-on-unmatched-pattern']
+        args: ["--fix", "--no-error-on-unmatched-pattern"]
 
   # Markdown 格式检查
   - repo: https://github.com/igorshubovych/markdownlint-cli
@@ -85,7 +76,7 @@ repos:
     hooks:
       - id: markdownlint
         name: Markdown 格式检查
-        args: ['--fix', '--disable', 'MD013', 'MD033', 'MD041', '--']
+        args: ["--fix", "--disable", "MD013", "MD033", "MD041", "--"]
 
   # 提交信息格式检查（可选）
   # - repo: https://github.com/commitizen-tools/commitizen

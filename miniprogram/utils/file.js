@@ -7,22 +7,32 @@ const { getExt, copyToClipboard, showLoading, hideLoading, showToast } = require
 
 /**
  * 从微信聊天选择文件
- * @param {string[]} allowedExt - 允许的扩展名列表
+ * @param {string[]} allowedExt - 允许的扩展名列表（可带点或不带点）
  * @param {number} count - 最多选择数量
  * @returns {Promise<Array>} 选择的文件列表
  */
 function chooseMessageFile(allowedExt, count = 9) {
   return new Promise((resolve, reject) => {
+    // 微信 API 要求扩展名不带点，如 ['mp3', 'wav']
+    // 自动处理传入的带点格式，如 ['.mp3', '.wav'] -> ['mp3', 'wav']
+    const normalizedExt = Array.isArray(allowedExt)
+      ? allowedExt.map(ext => ext.replace(/^\./, ''))
+      : [];
+
+    console.log('chooseMessageFile - 原始扩展名:', allowedExt);
+    console.log('chooseMessageFile - 处理后扩展名:', normalizedExt);
+
     wx.chooseMessageFile({
       count,
       type: "file",
-      extension: allowedExt,
+      extension: normalizedExt.length > 0 ? normalizedExt : undefined,
       success: (res) => {
+        console.log('chooseMessageFile - 选择成功:', res.tempFiles);
         resolve(res.tempFiles);
       },
       fail: (err) => {
         console.error('文件选择失败:', err);
-        reject(new Error('文件选择失败'));
+        reject(err);
       }
     });
   });

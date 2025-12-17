@@ -51,9 +51,13 @@ class Settings(BaseSettings):
 
     # 转换配置
     MAX_CONCURRENT: int = 2
-    CONVERSION_TIMEOUT: int = 120  # 秒
+    CONVERSION_TIMEOUT: int = 300  # 秒（增加到5分钟以支持大文件）
     CLEANUP_INTERVAL: int = 3600  # 秒（1小时）
     FILE_EXPIRE_TIME: int = 24 * 60 * 60  # 秒（24小时）
+    
+    # PDF转换配置
+    PDF_LARGE_FILE_THRESHOLD_MB: int = 20  # 大文件阈值
+    PDF_STREAM_PROCESSING: bool = True  # 启用流式处理
 
     # 速率限制
     RATE_LIMIT_POINTS: int = 120

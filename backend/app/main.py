@@ -69,7 +69,7 @@ async def periodic_cleanup():
 app = FastAPI(
     title="ConvertEasy Backend",
     description="文件格式转换服务 - 支持文档和音频格式互转",
-    version="2.0.0",
+    version="2.1.0",
     lifespan=lifespan,
 )
 
@@ -105,7 +105,7 @@ async def health_check():
         "ok": True,
         "timestamp": datetime.now().isoformat(),
         "service": "converteasy-backend",
-        "version": "2.0.0",
+        "version": "2.1.0",
     }
 
 

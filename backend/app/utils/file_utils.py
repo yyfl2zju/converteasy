@@ -40,7 +40,7 @@ def is_conversion_supported(category: str, source_ext: str, target_format: str) 
             source_key = source_ext.lstrip(".").lower()
             if source_key == "jpeg":
                 source_key = "jpg"
-            
+
             # 检查目标格式是否在支持列表中
             if target_format in conversions:
                 # 检查源格式是否在目标格式的支持列表中
@@ -48,7 +48,7 @@ def is_conversion_supported(category: str, source_ext: str, target_format: str) 
                 # 但上面的 config.py 定义似乎是 source -> [targets] ???
                 # 让我们检查 config.py 的定义
                 pass
-        
+
         return target_format in conversions and source_ext in conversions[target_format]
 
     conversions = SUPPORTED_CONVERSIONS.get("document", {})

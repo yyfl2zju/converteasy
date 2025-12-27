@@ -13,31 +13,25 @@ from docx.shared import Pt
 
 def save_document(doc, doc_path):
     """保存文档，如果目标是 .doc，则先保存为 .docx 再转换"""
-    if doc_path.lower().endswith('.doc'):
+    if doc_path.lower().endswith(".doc"):
         temp_docx = doc_path + "x"
         doc.save(temp_docx)
         print(f"[INFO] 已保存临时文件: {temp_docx}")
-        
+
         try:
-            print(f"[INFO] 正在调用 LibreOffice 将 DOCX 转换为 DOC...")
+            print("[INFO] 正在调用 LibreOffice 将 DOCX 转换为 DOC...")
             out_dir = os.path.dirname(os.path.abspath(doc_path))
-            
-            cmd = [
-                "soffice",
-                "--headless",
-                "--convert-to", "doc",
-                "--outdir", out_dir,
-                temp_docx
-            ]
-            
+
+            cmd = ["soffice", "--headless", "--convert-to", "doc", "--outdir", out_dir, temp_docx]
+
             subprocess.run(cmd, check=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            
+
             if os.path.exists(temp_docx):
                 os.remove(temp_docx)
-                
+
             if not os.path.exists(doc_path):
                 print(f"[WARNING] LibreOffice 转换看似成功但未找到输出文件: {doc_path}")
-                
+
         except Exception as e:
             print(f"[ERROR] LibreOffice 转换失败: {e}")
             print("[INFO] 回退方案: 直接重命名 .docx 为 .doc")

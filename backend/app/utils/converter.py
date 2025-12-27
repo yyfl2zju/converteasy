@@ -206,23 +206,23 @@ async def run_image_conversion(input_path: str, output_path: str, target_format:
     """运行图片转换脚本"""
     script_path = settings.SCRIPTS_DIR / "image_convert.py"
     python_path = shutil.which(settings.PYTHON_PATH) or settings.PYTHON_PATH
-    
-    cmd = f'"{python_path}" "{script_path}" -i "{input_path}" -o "{output_path}" -t "{target_format}"'
-    
-    print(f"🖼️ Running Image conversion: {cmd}")
-    
-    proc = await asyncio.create_subprocess_shell(
-        cmd,
-        stdout=asyncio.subprocess.PIPE,
-        stderr=asyncio.subprocess.PIPE
+
+    cmd = (
+        f'"{python_path}" "{script_path}" -i "{input_path}" -o "{output_path}" -t "{target_format}"'
     )
-    
+
+    print(f"🖼️ Running Image conversion: {cmd}")
+
+    proc = await asyncio.create_subprocess_shell(
+        cmd, stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+    )
+
     stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=settings.CONVERSION_TIMEOUT)
-    
+
     if stdout:
         print(f"Image output: {safe_decode(stdout)}")
     if stderr:
         print(f"Image warnings: {safe_decode(stderr)}")
-        
+
     if not Path(output_path).exists():
         raise Exception("Image conversion failed, output not found")

@@ -1,10 +1,9 @@
-import os
 import time
 import pytest
 from pathlib import Path
-from fastapi.testclient import TestClient
 
 SAMPLES_DIR = Path(__file__).parent / "samples"
+
 
 def test_detect_targets_image(client):
     """Test detecting targets for an image file"""
@@ -18,13 +17,14 @@ def test_detect_targets_image(client):
             files={"file": ("sample.jpg", f, "image/jpeg")},
             data={"category": "image"},
         )
-    
+
     assert response.status_code == 200
     data = response.json()
     assert data["category"] == "image"
     assert data["sourceExtension"] == ".jpg"
     assert "png" in data["supportedTargets"]
     assert "pdf" in data["supportedTargets"]
+
 
 def test_image_conversion_jpg_to_png(client):
     """Test converting JPG to PNG"""
@@ -37,12 +37,9 @@ def test_image_conversion_jpg_to_png(client):
         response = client.post(
             "/convert/upload",
             files={"file": ("sample.jpg", f, "image/jpeg")},
-            data={
-                "category": "image",
-                "target": "png"
-            },
+            data={"category": "image", "target": "png"},
         )
-    
+
     assert response.status_code == 200
     task_id = response.json()["taskId"]
     assert task_id
@@ -56,10 +53,11 @@ def test_image_conversion_jpg_to_png(client):
         if data["state"] in ["finished", "error"]:
             break
         time.sleep(0.5)
-    
+
     assert data["state"] == "finished"
     assert data["url"]
     assert data["url"].endswith(".png")
+
 
 def test_image_conversion_png_to_pdf(client):
     """Test converting PNG to PDF"""
@@ -72,12 +70,9 @@ def test_image_conversion_png_to_pdf(client):
         response = client.post(
             "/convert/upload",
             files={"file": ("sample.png", f, "image/png")},
-            data={
-                "category": "image",
-                "target": "pdf"
-            },
+            data={"category": "image", "target": "pdf"},
         )
-    
+
     assert response.status_code == 200
     task_id = response.json()["taskId"]
     assert task_id
@@ -91,7 +86,7 @@ def test_image_conversion_png_to_pdf(client):
         if data["state"] in ["finished", "error"]:
             break
         time.sleep(0.5)
-    
+
     assert data["state"] == "finished"
     assert data["url"]
     assert data["url"].endswith(".pdf")

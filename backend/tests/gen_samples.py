@@ -121,7 +121,7 @@ def make_images():
         return
 
     # Create a simple image
-    img = Image.new('RGB', (100, 100), color='red')
+    img = Image.new("RGB", (100, 100), color="red")
     d = ImageDraw.Draw(img)
     d.text((10, 10), "Test", fill=(255, 255, 0))
 

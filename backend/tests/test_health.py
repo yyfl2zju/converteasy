@@ -4,4 +4,4 @@ def test_health_endpoint(client):
     data = resp.json()
     assert data["ok"] is True
     assert data["service"] == "converteasy-backend"
-    assert data["version"] == "2.0.0"
+    assert data["version"] == "2.2.0"

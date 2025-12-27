@@ -27,6 +27,7 @@ async def lifespan(app: FastAPI):
     print(f"📦 文件大小限制: {settings.MAX_FILE_SIZE_MB}MB")
     print(f"📄 支持文档格式: {', '.join(settings.ALLOWED_DOC_EXT)}")
     print(f"🎵 支持音频格式: {', '.join(settings.ALLOWED_AUDIO_EXT)}")
+    print(f"🖼️ 支持图片格式: {', '.join(settings.ALLOWED_IMAGE_EXT)}")
     print(f"⚡ 并发转换数: {settings.MAX_CONCURRENT}")
 
     # 确保目录存在

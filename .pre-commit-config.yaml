@@ -1,0 +1,116 @@
+# Pre-commit hooks 配置
+# 安装: pip install pre-commit && pre-commit install
+# 手动运行: pre-commit run --all-files
+
+repos:
+  # 通用检查
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: trailing-whitespace
+        name: 移除尾随空格
+      - id: end-of-file-fixer
+        name: 确保文件以换行符结尾
+      - id: check-yaml
+        name: 检查 YAML 语法
+      - id: check-json
+        name: 检查 JSON 语法
+      - id: check-added-large-files
+        name: 检查大文件
+        args: ["--maxkb=1000"]
+      - id: check-merge-conflict
+        name: 检查合并冲突标记
+      - id: mixed-line-ending
+        name: 统一换行符
+        args: ["--fix=lf"]
+      - id: detect-private-key
+        name: 检测私钥文件
+
+  # Python 代码格式化 - Black
+  - repo: https://github.com/psf/black
+    rev: 24.3.0
+    hooks:
+      - id: black
+        name: Black 格式化
+        language_version: python3
+        files: ^backend/
+        args: ["--line-length=100"]
+
+  # Python 代码检查 - Flake8
+  - repo: https://github.com/pycqa/flake8
+    rev: 7.0.0
+    hooks:
+      - id: flake8
+        name: Flake8 代码检查
+        files: ^backend/
+        args:
+          - "--max-line-length=100"
+          - "--extend-ignore=E203,E501,W503"
+          - "--exclude=__pycache__,*.pyc,.git,venv"
+
+  # Python 类型检查 - mypy（可选，较严格）
+  # - repo: https://github.com/pre-commit/mirrors-mypy
+  #   rev: v1.8.0
+  #   hooks:
+  #     - id: mypy
+  #       name: mypy 类型检查
+  #       files: ^backend/
+  #       additional_dependencies: [types-requests, fastapi, pydantic]
+  #       args: ['--ignore-missing-imports']
+
+  # JavaScript/小程序代码检查 - ESLint
+  - repo: https://github.com/pre-commit/mirrors-eslint
+    rev: v9.0.0
+    hooks:
+      - id: eslint
+        name: ESLint 代码检查
+        files: ^miniprogram/.*\.js$
+        exclude: ^miniprogram/(types|miniprogram_npm)/
+        types: [file]
+        additional_dependencies:
+          - eslint@8.57.0
+        args: ["--fix", "--no-error-on-unmatched-pattern"]
+
+  # Markdown 格式检查
+  - repo: https://github.com/igorshubovych/markdownlint-cli
+    rev: v0.39.0
+    hooks:
+      - id: markdownlint
+        name: Markdown 格式检查
+        args:
+          [
+            "--fix",
+            "--disable",
+            "MD013",
+            "MD033",
+            "MD036",
+            "MD040",
+            "MD041",
+            "--",
+          ]
+
+  # 提交信息格式检查（可选）
+  # - repo: https://github.com/commitizen-tools/commitizen
+  #   rev: v3.14.1
+  #   hooks:
+  #     - id: commitizen
+  #       name: 提交信息格式检查
+  #       stages: [commit-msg]
+
+# 全局配置
+default_language_version:
+  python: python3
+
+# 排除文件
+exclude: |
+  (?x)^(
+    .*\.min\.js|
+    .*\.min\.css|
+    node_modules/|
+    __pycache__/|
+    \.git/|
+    dist/|
+    build/|
+    .*\.egg-info/|
+    miniprogram/miniprogram_npm/
+  )$

@@ -1,0 +1,16 @@
+# 忽略目录
+
+node_modules/
+miniprogram_npm/
+**pycache**/
+\*.pyc
+coverage/
+
+# 忽略文件类型
+
+_.wxml
+_.wxss
+_.json
+_.md
+_.ts
+_.d.ts

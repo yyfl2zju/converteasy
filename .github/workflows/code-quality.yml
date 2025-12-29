@@ -1,0 +1,65 @@
+# 代码质量检查 CI
+name: Code Quality
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: "pip"
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: 安装 Python 代码检查工具
+        run: |
+          pip install black flake8
+
+      - name: 检查 Python 代码格式 (Black)
+        run: |
+          black --check --line-length=100 backend/
+
+      - name: 检查 Python 代码风格 (Flake8)
+        run: |
+          flake8 backend/ --max-line-length=100 --extend-ignore=E203,E501,W503 --exclude=__pycache__,*.pyc,.git,venv
+
+      - name: 安装前端依赖
+        run: |
+          cd miniprogram
+          npm ci || npm install
+
+      - name: 检查前端代码 (ESLint)
+        run: |
+          cd miniprogram
+          npx eslint "**/*.js" --ignore-pattern "types/" --ignore-pattern "miniprogram_npm/" --no-error-on-unmatched-pattern || true
+
+  pre-commit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 设置 Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: 运行 pre-commit
+        uses: pre-commit/action@v3.0.1
+        continue-on-error: true

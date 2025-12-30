@@ -31,7 +31,7 @@ Page({
   data: {
     // 主题
     darkMode: false,
-    
+
     sourceFormats: AUDIO_SOURCE_FORMATS,
     sourceIndex: -1,
     targetFormats: AUDIO_SOURCE_FORMATS,
@@ -62,7 +62,7 @@ Page({
       darkMode: app.globalData.darkMode
     });
     this.applyTheme();
-    
+
     this.loadSupportedFormats();
   },
 

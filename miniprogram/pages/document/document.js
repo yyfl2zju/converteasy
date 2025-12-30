@@ -29,7 +29,7 @@ Page({
   data: {
     // 主题
     darkMode: false,
-    
+
     // 源格式
     sourceFormats: DOCUMENT_SOURCE_FORMATS,
     sourceFormatDisplay: DOCUMENT_SOURCE_FORMAT_DISPLAY,
@@ -60,7 +60,7 @@ Page({
       darkMode: app.globalData.darkMode
     });
     this.applyTheme();
-    
+
     this.testConnection();
     this.loadFormats();
   },

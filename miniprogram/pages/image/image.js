@@ -29,7 +29,7 @@ Page({
   data: {
     // 主题
     darkMode: false,
-    
+
     // 源格式
     sourceFormats: IMAGE_SOURCE_FORMATS,
     sourceFormatDisplay: IMAGE_SOURCE_FORMAT_DISPLAY,
@@ -60,7 +60,7 @@ Page({
       darkMode: app.globalData.darkMode
     });
     this.applyTheme();
-    
+
     this.testConnection();
     this.loadFormats();
   },
@@ -192,7 +192,7 @@ Page({
     }
 
     const that = this;
-    
+
     wx.chooseImage({
       count: 9,  // 最多选择9张
       sizeType: ['original', 'compressed'],
@@ -219,7 +219,7 @@ Page({
     for (const file of tempFiles) {
       // 相册图片可能没有扩展名，需要根据 type 判断
       let extWithDot = getExt(file.path);
-      
+
       // 如果没有扩展名，尝试从文件类型推断
       if (!extWithDot && file.type) {
         const typeMap = {

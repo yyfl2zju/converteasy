@@ -1,6 +1,7 @@
 """
 测试依赖检查脚本
 """
+
 import pytest
 from unittest.mock import patch, MagicMock
 from app.scripts.check_dependencies import check_dependencies
@@ -15,19 +16,19 @@ def test_check_dependencies_all_present():
 
 def test_check_dependencies_with_mock_imports():
     """测试特殊包名的导入逻辑"""
-    with patch('builtins.__import__') as mock_import:
+    with patch("builtins.__import__") as mock_import:
         # 模拟导入成功
         mock_import.return_value = MagicMock()
-        
+
         # 测试特殊包名映射
         test_packages = {
-            'pymupdf': 'fitz',
-            'pdfminer.six': 'pdfminer',
-            'python-docx': 'docx',
-            'python-pptx': 'pptx',
-            'beautifulsoup4': 'bs4'
+            "pymupdf": "fitz",
+            "pdfminer.six": "pdfminer",
+            "python-docx": "docx",
+            "python-pptx": "pptx",
+            "beautifulsoup4": "bs4",
         }
-        
+
         # 验证这些包名可以被正确处理
         for package_name, actual_import in test_packages.items():
             try:
@@ -52,12 +53,15 @@ def test_check_dependencies_return_type():
     assert isinstance(result, bool), "check_dependencies应该返回布尔值"
 
 
-@pytest.mark.parametrize("package,expected_import", [
-    ("pymupdf", "fitz"),
-    ("python-docx", "docx"),
-    ("python-pptx", "pptx"),
-    ("beautifulsoup4", "bs4"),
-])
+@pytest.mark.parametrize(
+    "package,expected_import",
+    [
+        ("pymupdf", "fitz"),
+        ("python-docx", "docx"),
+        ("python-pptx", "pptx"),
+        ("beautifulsoup4", "bs4"),
+    ],
+)
 def test_special_package_name_mapping(package, expected_import):
     """测试特殊包名到实际导入名的映射"""
     # 验证特殊包名的处理逻辑

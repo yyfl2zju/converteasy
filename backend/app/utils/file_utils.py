@@ -215,7 +215,7 @@ async def check_dependencies() -> None:
         if candidate and Path(str(candidate)).exists():
             soffice_path = candidate
             break
-    
+
     if soffice_path:
         try:
             proc = await asyncio.create_subprocess_exec(
@@ -247,11 +247,14 @@ async def check_dependencies() -> None:
         if candidate and Path(str(candidate)).exists():
             ffmpeg_path = candidate
             break
-            
+
     if ffmpeg_path:
         try:
             proc = await asyncio.create_subprocess_exec(
-                str(ffmpeg_path), "-version", stdout=asyncio.subprocess.PIPE, stderr=asyncio.subprocess.PIPE
+                str(ffmpeg_path),
+                "-version",
+                stdout=asyncio.subprocess.PIPE,
+                stderr=asyncio.subprocess.PIPE,
             )
             stdout, stderr = await asyncio.wait_for(proc.communicate(), timeout=5.0)
             if proc.returncode == 0 and stdout:
@@ -268,6 +271,7 @@ async def check_dependencies() -> None:
     try:
         import PIL
         import fitz
+
         print("✓ 图片转换依赖可用: Pillow, PyMuPDF")
     except ImportError as e:
         print(f"✗ 图片转换依赖缺失: {e}")
@@ -278,6 +282,7 @@ async def check_dependencies() -> None:
         import docx
         import openpyxl
         import pandas
+
         print("✓ Python 文档转换依赖可用")
     except ImportError as e:
         print(f"⚠ 部分 Python 依赖缺失: {e}")
